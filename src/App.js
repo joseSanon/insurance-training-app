@@ -573,7 +573,6 @@ function App() {
                     >
                       <div className="flex items-center justify-between mb-3">
                         <span className="text-4xl">{categoryIcons[category] || '📚'}</span>
-                        <ChevronRight className="w-6 h-6 text-gray-400 group-hover
                         <ChevronRight className="w-6 h-6 text-gray-400 group-hover:text-indigo-600 transition-colors" />
                       </div>
                       <h3 className="text-lg font-bold text-gray-800 mb-2">{category}</h3>
