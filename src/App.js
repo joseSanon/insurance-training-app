@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { Search, BookOpen, Shield, Plus, Edit2, Trash2, X, Check, ChevronRight, Upload, FileSpreadsheet } from 'lucide-react';
+import { Search, BookOpen, Shield, Plus, Edit2, Trash2, X, Check, ChevronRight, Upload, FileSpreadsheet, Lightbulb } from 'lucide-react';
 import * as XLSX from 'xlsx';
 
 const INITIAL_TERMS = [
@@ -7,6 +7,7 @@ const INITIAL_TERMS = [
     id: 1,
     word: "Prime d'assurance",
     definition: "Somme versée par l'assuré à l'assureur en contrepartie de la garantie qui lui est accordée.",
+    example: "Paul paie 1 200€ de prime annuelle pour son assurance habitation. Cette somme lui garantit une protection en cas de sinistre (incendie, dégât des eaux, vol, etc.).",
     category: "Assurance Vie",
     subCategory: "Concepts généraux",
     createdAt: "2025-01-15T10:30:00Z",
@@ -16,6 +17,7 @@ const INITIAL_TERMS = [
     id: 2,
     word: "Sinistre",
     definition: "Événement dommageable prévu au contrat et donnant lieu à une intervention de l'assureur.",
+    example: "Un incendie se déclare dans l'appartement de Marie. Elle déclare le sinistre à son assureur qui envoie un expert pour évaluer les dégâts et procéder à l'indemnisation.",
     category: "Assurance Non-Vie",
     subCategory: "Gestion des sinistres",
     createdAt: "2025-01-15T10:30:00Z",
@@ -25,6 +27,7 @@ const INITIAL_TERMS = [
     id: 3,
     word: "Franchise",
     definition: "Montant qui reste à la charge de l'assuré en cas de sinistre, non remboursé par l'assureur.",
+    example: "Après un accident automobile responsable, les réparations coûtent 3 000€. Avec une franchise de 500€, l'assurance rembourse 2 500€ et l'assuré paie 500€ de sa poche.",
     category: "Assurance Auto",
     subCategory: "Indemnisation",
     createdAt: "2025-01-15T10:30:00Z",
@@ -34,6 +37,7 @@ const INITIAL_TERMS = [
     id: 4,
     word: "Bénéficiaire",
     definition: "Personne désignée pour recevoir le capital ou la rente en cas de décès de l'assuré.",
+    example: "Jean souscrit une assurance-vie et désigne sa fille comme bénéficiaire. À son décès, elle recevra le capital de 100 000€ prévu au contrat.",
     category: "Assurance Vie",
     subCategory: "Acteurs",
     createdAt: "2025-01-15T10:30:00Z",
@@ -43,6 +47,7 @@ const INITIAL_TERMS = [
     id: 5,
     word: "Rétrocession",
     definition: "Opération par laquelle un réassureur cède à son tour une partie des risques qu'il a acceptés.",
+    example: "Un réassureur français accepte de couvrir des risques de catastrophes naturelles, puis rétrocède 30% de ces risques à un réassureur international pour limiter son exposition.",
     category: "Réassurance",
     subCategory: "Techniques de réassurance",
     createdAt: "2025-01-15T10:30:00Z",
@@ -52,6 +57,7 @@ const INITIAL_TERMS = [
     id: 6,
     word: "Responsabilité civile",
     definition: "Obligation de réparer les dommages causés à autrui par sa faute, négligence ou imprudence.",
+    example: "Sophie renverse accidentellement un vase chez des amis lors d'un dîner. Sa responsabilité civile vie privée couvre le remboursement du vase cassé.",
     category: "MRH",
     subCategory: "Garanties",
     createdAt: "2025-01-15T10:30:00Z",
@@ -61,6 +67,7 @@ const INITIAL_TERMS = [
     id: 7,
     word: "Valeur de rachat",
     definition: "Montant que l'assureur verse à l'assuré qui souhaite mettre fin à son contrat avant son terme.",
+    example: "Après 10 ans de cotisations sur son assurance-vie, Thomas décide de récupérer son épargne. La valeur de rachat s'élève à 45 000€, correspondant à ses versements plus les intérêts capitalisés.",
     category: "Assurance Vie",
     subCategory: "Épargne",
     createdAt: "2025-01-15T10:30:00Z",
@@ -70,6 +77,7 @@ const INITIAL_TERMS = [
     id: 8,
     word: "Bonus-malus",
     definition: "Système de réduction ou majoration de la prime en fonction du nombre de sinistres responsables.",
+    example: "Claire n'a pas eu d'accident responsable depuis 5 ans. Son coefficient bonus-malus est de 0,50, ce qui lui permet de payer 50% de moins sur sa prime de référence.",
     category: "Assurance Auto",
     subCategory: "Tarification",
     createdAt: "2025-01-15T10:30:00Z",
@@ -79,6 +87,7 @@ const INITIAL_TERMS = [
     id: 9,
     word: "Traité de réassurance",
     definition: "Contrat par lequel un assureur (cédante) transfère une partie de ses risques à un réassureur selon des conditions définies.",
+    example: "Une compagnie d'assurance française signe un traité avec un réassureur pour céder automatiquement 40% de tous les risques automobiles qu'elle souscrit.",
     category: "Réassurance",
     subCategory: "Contrats",
     createdAt: "2025-01-15T10:30:00Z",
@@ -88,6 +97,7 @@ const INITIAL_TERMS = [
     id: 10,
     word: "Quote-part",
     definition: "Type de réassurance proportionnelle où le réassureur prend un pourcentage fixe de tous les risques couverts par l'assureur.",
+    example: "Un assureur cède 25% en quote-part. Pour un contrat avec une prime de 1 000€ et un sinistre de 5 000€, le réassureur reçoit 250€ de prime et paie 1 250€ du sinistre.",
     category: "Réassurance",
     subCategory: "Techniques de réassurance",
     createdAt: "2025-01-15T10:30:00Z",
@@ -97,6 +107,7 @@ const INITIAL_TERMS = [
     id: 11,
     word: "Excédent de sinistre",
     definition: "Forme de réassurance non proportionnelle où le réassureur intervient au-delà d'un certain montant de sinistre.",
+    example: "Un assureur fixe sa rétention à 500 000€. En cas de sinistre de 2 millions€, il paie les premiers 500 000€ et le réassureur en excédent de sinistre prend en charge 1,5 million€.",
     category: "Réassurance",
     subCategory: "Techniques de réassurance",
     createdAt: "2025-01-15T10:30:00Z",
@@ -106,6 +117,7 @@ const INITIAL_TERMS = [
     id: 12,
     word: "Cédante",
     definition: "Compagnie d'assurance qui cède une partie de ses risques à un réassureur pour réduire son exposition.",
+    example: "La compagnie AXA, en tant que cédante, transfère une partie de ses risques liés aux catastrophes naturelles à Swiss Re, le réassureur.",
     category: "Réassurance",
     subCategory: "Acteurs",
     createdAt: "2025-01-15T10:30:00Z",
@@ -115,6 +127,7 @@ const INITIAL_TERMS = [
     id: 13,
     word: "Commission de réassurance",
     definition: "Rémunération versée par le réassureur à la cédante pour couvrir ses frais d'acquisition et de gestion des contrats.",
+    example: "Pour un traité en quote-part, le réassureur verse une commission de 30% à la cédante sur les primes cédées pour compenser les frais de distribution et de gestion des polices.",
     category: "Réassurance",
     subCategory: "Aspects financiers",
     createdAt: "2025-01-15T10:30:00Z",
@@ -133,15 +146,16 @@ function App() {
   const [showImportModal, setShowImportModal] = useState(false);
   const [importError, setImportError] = useState('');
   const [terms, setTerms] = useState([]);
+  const [expandedTermId, setExpandedTermId] = useState(null);
 
   const [newTerm, setNewTerm] = useState({
     word: '',
     definition: '',
+    example: '',
     category: '',
     subCategory: ''
   });
 
-  // Charger les données au démarrage
   useEffect(() => {
     const savedTerms = localStorage.getItem('insuranceTerms');
     if (savedTerms) {
@@ -152,7 +166,6 @@ function App() {
     }
   }, []);
 
-  // Sauvegarder les données à chaque modification
   useEffect(() => {
     if (terms.length > 0) {
       localStorage.setItem('insuranceTerms', JSON.stringify(terms));
@@ -202,8 +215,15 @@ function App() {
     };
   }, [terms, searchTerm]);
 
+  const isFormValid = () => {
+    return newTerm.word.trim() !== '' && 
+           newTerm.definition.trim() !== '' && 
+           newTerm.category !== '' && 
+           newTerm.subCategory.trim() !== '';
+  };
+
   const handleAddTerm = () => {
-    if (newTerm.word && newTerm.definition && newTerm.category && newTerm.subCategory) {
+    if (isFormValid()) {
       const now = new Date().toISOString();
       
       if (editingTerm) {
@@ -217,7 +237,7 @@ function App() {
         const maxId = terms.length > 0 ? Math.max(...terms.map(t => t.id)) : 0;
         setTerms([...terms, { ...newTerm, id: maxId + 1, createdAt: now, updatedAt: now }]);
       }
-      setNewTerm({ word: '', definition: '', category: '', subCategory: '' });
+      setNewTerm({ word: '', definition: '', example: '', category: '', subCategory: '' });
       setShowAddModal(false);
     }
   };
@@ -227,6 +247,7 @@ function App() {
     setNewTerm({
       word: term.word,
       definition: term.definition,
+      example: term.example || '',
       category: term.category,
       subCategory: term.subCategory
     });
@@ -235,6 +256,10 @@ function App() {
 
   const handleDeleteTerm = (id) => {
     setTerms(terms.filter(term => term.id !== id));
+  };
+
+  const toggleExpand = (termId) => {
+    setExpandedTermId(expandedTermId === termId ? null : termId);
   };
 
   const handleFileUpload = (e) => {
@@ -256,6 +281,7 @@ function App() {
         const newTerms = jsonData.map((row, index) => {
           const word = row.Mot || row.mot || row.Terme || row.terme || '';
           const definition = row.Définition || row.Definition || row.définition || row.definition || '';
+          const example = row.Exemple || row.exemple || row.Example || row.example || '';
           const category = row.Catégorie || row.Categorie || row.catégorie || row.categorie || row.Thématique || row.Thematique || '';
           const subCategory = row['Sous-catégorie'] || row['Sous-categorie'] || row['sous-catégorie'] || row['sous-categorie'] || row['Sous-thématique'] || row['Sous-thematique'] || '';
 
@@ -267,6 +293,7 @@ function App() {
             id: maxId + index + 1,
             word: word.trim(),
             definition: definition.trim(),
+            example: example ? example.trim() : '',
             category: category.trim(),
             subCategory: subCategory.trim(),
             createdAt: now,
@@ -290,6 +317,7 @@ function App() {
       {
         'Mot': 'Exemple terme',
         'Définition': 'Définition du terme',
+        'Exemple': 'Exemple d\'application concret du terme',
         'Catégorie': 'Assurance Vie',
         'Sous-catégorie': 'Concepts généraux'
       }
@@ -309,9 +337,85 @@ function App() {
     "MRH": "🏠"
   };
 
+  const TermCard = ({ term, isSecondary = false }) => {
+    const isExpanded = expandedTermId === term.id;
+    
+    return (
+      <div className={`${isSecondary ? 'bg-gray-50 border-gray-200' : 'bg-white border-gray-100'} rounded-xl p-${isSecondary ? '5' : '6'} shadow-sm hover:shadow-md transition-all border`}>
+        <div className="flex items-start justify-between">
+          <div className="flex-1">
+            <div 
+              className="flex items-center space-x-3 mb-2 cursor-pointer group"
+              onClick={() => toggleExpand(term.id)}
+            >
+              <h3 className={`${isSecondary ? 'text-lg font-semibold text-gray-600' : 'text-xl font-bold text-gray-800'} group-hover:text-indigo-600 transition-colors`}>
+                {term.word}
+              </h3>
+              <span className={`${isSecondary ? 'text-xl opacity-60' : 'text-2xl'}`}>
+                {categoryIcons[term.category] || '📚'}
+              </span>
+              {term.example && (
+                <Lightbulb className={`w-5 h-5 ${isExpanded ? 'text-amber-500' : 'text-gray-400'} group-hover:text-amber-500 transition-colors`} />
+              )}
+            </div>
+            <p className={`${isSecondary ? 'text-gray-500 text-sm italic' : 'text-gray-600'} mb-3 leading-relaxed`}>
+              {term.definition}
+            </p>
+            
+            {isExpanded && term.example && (
+              <div className="mt-4 p-4 bg-amber-50 border-l-4 border-amber-400 rounded-r-lg animate-fadeIn">
+                <div className="flex items-start space-x-2">
+                  <Lightbulb className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <h4 className="font-semibold text-amber-900 mb-1">Exemple d'application</h4>
+                    <p className="text-amber-800 text-sm leading-relaxed">{term.example}</p>
+                  </div>
+                </div>
+              </div>
+            )}
+            
+            <div className="flex flex-wrap gap-2 mt-3">
+              <span className={`px-${isSecondary ? '2.5' : '3'} py-${isSecondary ? '0.5' : '1'} ${isSecondary ? 'bg-gray-200 text-gray-600 text-xs' : 'bg-indigo-100 text-indigo-700 text-sm'} rounded-full font-medium`}>
+                {term.category}
+              </span>
+              <span className={`px-${isSecondary ? '2.5' : '3'} py-${isSecondary ? '0.5' : '1'} ${isSecondary ? 'bg-gray-200 text-gray-600 text-xs' : 'bg-purple-100 text-purple-700 text-sm'} rounded-full font-medium`}>
+                {term.subCategory}
+              </span>
+            </div>
+          </div>
+          {isAdmin && (
+            <div className="flex space-x-2 ml-4">
+              <button
+                onClick={() => handleEditTerm(term)}
+                className="p-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors"
+              >
+                <Edit2 className={`w-${isSecondary ? '3.5' : '4'} h-${isSecondary ? '3.5' : '4'}`} />
+              </button>
+              <button
+                onClick={() => handleDeleteTerm(term.id)}
+                className="p-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors"
+              >
+                <Trash2 className={`w-${isSecondary ? '3.5' : '4'} h-${isSecondary ? '3.5' : '4'}`} />
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
-      {/* Header */}
+      <style>{`
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(-10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fadeIn {
+          animation: fadeIn 0.3s ease-out;
+        }
+      `}</style>
+      
       <header className="bg-white shadow-sm border-b border-indigo-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
@@ -340,7 +444,6 @@ function App() {
         </div>
       </header>
 
-      {/* Navigation Tabs */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
         <div className="flex space-x-2 bg-white p-1 rounded-xl shadow-sm">
           <button
@@ -375,7 +478,6 @@ function App() {
         </div>
       </div>
 
-      {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {activeTab === 'search' && (
           <div className="space-y-6">
@@ -395,7 +497,7 @@ function App() {
                 <button
                   onClick={() => {
                     setEditingTerm(null);
-                    setNewTerm({ word: '', definition: '', category: '', subCategory: '' });
+                    setNewTerm({ word: '', definition: '', example: '', category: '', subCategory: '' });
                     setShowAddModal(true);
                   }}
                   className="flex-1 flex items-center justify-center space-x-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white px-6 py-4 rounded-xl font-medium shadow-lg hover:shadow-xl transition-all"
@@ -419,80 +521,12 @@ function App() {
             <div className="grid gap-4">
               {!searchTerm ? (
                 terms.sort((a, b) => a.word.localeCompare(b.word)).map(term => (
-                  <div key={term.id} className="bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition-all border border-gray-100">
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <div className="flex items-center space-x-3 mb-2">
-                          <h3 className="text-xl font-bold text-gray-800">{term.word}</h3>
-                          <span className="text-2xl">{categoryIcons[term.category] || '📚'}</span>
-                        </div>
-                        <p className="text-gray-600 mb-3 leading-relaxed">{term.definition}</p>
-                        <div className="flex flex-wrap gap-2">
-                          <span className="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-sm font-medium">
-                            {term.category}
-                          </span>
-                          <span className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm font-medium">
-                            {term.subCategory}
-                          </span>
-                        </div>
-                      </div>
-                      {isAdmin && (
-                        <div className="flex space-x-2 ml-4">
-                          <button
-                            onClick={() => handleEditTerm(term)}
-                            className="p-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors"
-                          >
-                            <Edit2 className="w-4 h-4" />
-                          </button>
-                          <button
-                            onClick={() => handleDeleteTerm(term.id)}
-                            className="p-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  </div>
+                  <TermCard key={term.id} term={term} />
                 ))
               ) : (
                 <>
                   {searchResults.primary.map(term => (
-                    <div key={term.id} className="bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition-all border border-gray-100">
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <div className="flex items-center space-x-3 mb-2">
-                            <h3 className="text-xl font-bold text-gray-800">{term.word}</h3>
-                            <span className="text-2xl">{categoryIcons[term.category] || '📚'}</span>
-                          </div>
-                          <p className="text-gray-600 mb-3 leading-relaxed">{term.definition}</p>
-                          <div className="flex flex-wrap gap-2">
-                            <span className="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-sm font-medium">
-                              {term.category}
-                            </span>
-                            <span className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm font-medium">
-                              {term.subCategory}
-                            </span>
-                          </div>
-                        </div>
-                        {isAdmin && (
-                          <div className="flex space-x-2 ml-4">
-                            <button
-                              onClick={() => handleEditTerm(term)}
-                              className="p-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors"
-                            >
-                              <Edit2 className="w-4 h-4" />
-                            </button>
-                            <button
-                              onClick={() => handleDeleteTerm(term.id)}
-                              className="p-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
-                          </div>
-                        )}
-                      </div>
-                    </div>
+                    <TermCard key={term.id} term={term} />
                   ))}
                   
                   {searchResults.secondary.length > 0 && (
@@ -507,41 +541,7 @@ function App() {
                       
                       <div className="grid gap-3">
                         {searchResults.secondary.map(term => (
-                          <div key={term.id} className="bg-gray-50 rounded-xl p-5 border border-gray-200 hover:bg-gray-100 transition-all">
-                            <div className="flex items-start justify-between">
-                              <div className="flex-1">
-                                <div className="flex items-center space-x-2 mb-2">
-                                  <h3 className="text-lg font-semibold text-gray-600">{term.word}</h3>
-                                  <span className="text-xl opacity-60">{categoryIcons[term.category] || '📚'}</span>
-                                </div>
-                                <p className="text-gray-500 text-sm mb-3 leading-relaxed italic">{term.definition}</p>
-                                <div className="flex flex-wrap gap-2">
-                                  <span className="px-2.5 py-0.5 bg-gray-200 text-gray-600 rounded-full text-xs font-medium">
-                                    {term.category}
-                                  </span>
-                                  <span className="px-2.5 py-0.5 bg-gray-200 text-gray-600 rounded-full text-xs font-medium">
-                                    {term.subCategory}
-                                  </span>
-                                </div>
-                              </div>
-                              {isAdmin && (
-                                <div className="flex space-x-2 ml-4">
-                                  <button
-                                    onClick={() => handleEditTerm(term)}
-                                    className="p-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors"
-                                  >
-                                    <Edit2 className="w-3.5 h-3.5" />
-                                  </button>
-                                  <button
-                                    onClick={() => handleDeleteTerm(term.id)}
-                                    className="p-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors"
-                                  >
-                                    <Trash2 className="w-3.5 h-3.5" />
-                                  </button>
-                                </div>
-                              )}
-                            </div>
-                          </div>
+                          <TermCard key={term.id} term={term} isSecondary={true} />
                         ))}
                       </div>
                     </div>
@@ -630,30 +630,7 @@ function App() {
                 <p className="text-gray-500 mb-6">{selectedCategory}</p>
                 <div className="grid gap-4">
                   {terms.filter(t => t.category === selectedCategory && t.subCategory === selectedSubCategory).map(term => (
-                    <div key={term.id} className="bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition-all border border-gray-100">
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <h3 className="text-xl font-bold text-gray-800 mb-2">{term.word}</h3>
-                          <p className="text-gray-600 leading-relaxed">{term.definition}</p>
-                        </div>
-                        {isAdmin && (
-                          <div className="flex space-x-2 ml-4">
-                            <button
-                              onClick={() => handleEditTerm(term)}
-                              className="p-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors"
-                            >
-                              <Edit2 className="w-4 h-4" />
-                            </button>
-                            <button
-                              onClick={() => handleDeleteTerm(term.id)}
-                              className="p-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
-                          </div>
-                        )}
-                      </div>
-                    </div>
+                    <TermCard key={term.id} term={term} />
                   ))}
                 </div>
               </div>
@@ -662,17 +639,15 @@ function App() {
         )}
       </div>
 
-      {/* Footer */}
       <footer className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 mt-12">
         <div className="text-center text-gray-500 text-sm">
           © {new Date().getFullYear()} Formation Assurance - Tous droits réservés
         </div>
       </footer>
 
-      {/* Add/Edit Modal */}
       {showAddModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-2xl p-8 max-w-2xl w-full shadow-2xl">
+          <div className="bg-white rounded-2xl p-8 max-w-2xl w-full shadow-2xl max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold text-gray-800">
                 {editingTerm ? 'Modifier le terme' : 'Ajouter un terme'}
@@ -681,7 +656,7 @@ function App() {
                 onClick={() => {
                   setShowAddModal(false);
                   setEditingTerm(null);
-                  setNewTerm({ word: '', definition: '', category: '', subCategory: '' });
+                  setNewTerm({ word: '', definition: '', example: '', category: '', subCategory: '' });
                 }}
                 className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
               >
@@ -709,6 +684,19 @@ function App() {
                   className="w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:border-indigo-500 focus:outline-none resize-none"
                   rows="4"
                   placeholder="Définition complète du terme..."
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Exemple d'application <span className="text-gray-400 font-normal">(optionnel)</span>
+                </label>
+                <textarea
+                  value={newTerm.example}
+                  onChange={(e) => setNewTerm({ ...newTerm, example: e.target.value })}
+                  className="w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:border-indigo-500 focus:outline-none resize-none"
+                  rows="3"
+                  placeholder="Exemple concret d'utilisation du terme..."
                 />
               </div>
               
@@ -743,7 +731,12 @@ function App() {
               
               <button
                 onClick={handleAddTerm}
-                className="w-full flex items-center justify-center space-x-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-6 py-4 rounded-xl font-medium shadow-lg hover:shadow-xl transition-all"
+                disabled={!isFormValid()}
+                className={`w-full flex items-center justify-center space-x-2 px-6 py-4 rounded-xl font-medium shadow-lg transition-all ${
+                  isFormValid()
+                    ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white hover:shadow-xl cursor-pointer'
+                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                }`}
               >
                 <Check className="w-5 h-5" />
                 <span>{editingTerm ? 'Enregistrer les modifications' : 'Ajouter le terme'}</span>
@@ -753,7 +746,6 @@ function App() {
         </div>
       )}
 
-      {/* Import Modal */}
       {showImportModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-2xl p-8 max-w-2xl w-full shadow-2xl">
@@ -784,6 +776,7 @@ function App() {
                     <ul className="text-sm text-blue-800 space-y-1">
                       <li>• <strong>Mot</strong> : le terme à définir</li>
                       <li>• <strong>Définition</strong> : la définition complète</li>
+                      <li>• <strong>Exemple</strong> : exemple d'application (optionnel)</li>
                       <li>• <strong>Catégorie</strong> : la thématique principale</li>
                       <li>• <strong>Sous-catégorie</strong> : la sous-thématique</li>
                     </ul>
