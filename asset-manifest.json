@@ -1,0 +1,10 @@
+{
+  "files": {
+    "main.js": "/insurance-training-app/static/js/main.e3c3641d.js",
+    "index.html": "/insurance-training-app/index.html",
+    "main.e3c3641d.js.map": "/insurance-training-app/static/js/main.e3c3641d.js.map"
+  },
+  "entrypoints": [
+    "static/js/main.e3c3641d.js"
+  ]
+}
